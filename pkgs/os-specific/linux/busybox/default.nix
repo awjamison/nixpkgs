@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, musl
+{ stdenv, lib, fetchurl, glibc, musl
 , enableStatic ? false
 , enableMinimal ? false
 , useMusl ? false
@@ -48,7 +48,7 @@ stdenv.mkDerivation rec {
 
     CONFIG_LFS y
 
-    ${stdenv.lib.optionalString enableStatic ''
+    ${lib.optionalString enableStatic ''
       CONFIG_STATIC y
     ''}
 
@@ -56,14 +56,19 @@ stdenv.mkDerivation rec {
     CONFIG_FEATURE_MOUNT_CIFS n
     CONFIG_FEATURE_MOUNT_HELPERS y
 
+    # Set paths for console fonts.
+    CONFIG_DEFAULT_SETFONT_DIR "/etc/kbd"
+
     ${extraConfig}
     $extraCrossConfig
     EOF
 
     make oldconfig
-  '' + stdenv.lib.optionalString useMusl ''
+  '' + lib.optionalString useMusl ''
     makeFlagsArray+=("CC=gcc -isystem ${musl}/include -B${musl}/lib -L${musl}/lib")
   '';
+
+  buildInputs = lib.optionals (enableStatic && !useMusl) [ glibc glibc.static ];
 
   crossAttrs = {
     extraCrossConfig = ''
