@@ -1,8 +1,8 @@
-{ stdenv, fetchurl, python, pkgconfig, qtbase, qtsvg, qtwebkit, sip, pythonDBus
-, lndir, makeWrapper, qmakeHook }:
+{ stdenv, fetchurl, python, pkgconfig, qtbase, qtsvg, qtwebengine, sip
+, pythonDBus, lndir, makeWrapper, qmakeHook }:
 
 let
-  version = "5.5.1";
+  version = "5.6";
 in stdenv.mkDerivation {
   name = "${python.libPrefix}-PyQt-${version}";
 
@@ -15,13 +15,13 @@ in stdenv.mkDerivation {
   };
 
   src = fetchurl {
-    url = "mirror://sourceforge/pyqt/PyQt5/PyQt-${version}/PyQt-gpl-${version}.tar.gz";
-    sha256 = "11l3pm0wkwkxzw4n3022iid3yyia5ap4l0ny1m5ngkzzzfafyw0a";
+    url = "mirror://sourceforge/pyqt/PyQt5/PyQt-${version}/PyQt5_gpl-${version}.tar.gz";
+    sha256 = "1qgh42zsr9jppl9k7fcdbhxcd1wrb7wyaj9lng9nxfa19in1lj1f";
   };
 
   buildInputs = [
     python pkgconfig makeWrapper lndir
-    qtbase qtsvg qtwebkit qmakeHook
+    qtbase qtsvg qtwebengine qmakeHook
   ];
 
   propagatedBuildInputs = [ sip ];
@@ -36,7 +36,6 @@ in stdenv.mkDerivation {
 
     substituteInPlace configure.py \
       --replace 'install_dir=pydbusmoddir' "install_dir='$out/lib/${python.libPrefix}/site-packages/dbus/mainloop'" \
-      --replace "ModuleMetadata(qmake_QT=['webkitwidgets'])" "ModuleMetadata(qmake_QT=['webkitwidgets', 'printsupport'])"
 
     ${python.executable} configure.py  -w \
       --confirm-license \
